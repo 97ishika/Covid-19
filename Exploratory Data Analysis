@@ -1,0 +1,77 @@
+#
+Importing necessary libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import graphviz
+from sklearn.linear_model
+import LinearRegression
+from sklearn.ensemble
+import RandomForestRegressor
+from sklearn.tree
+import DecisionTreeRegressor, export_graphviz
+from sklearn.preprocessing
+import StandardScaler
+from sklearn.externals.six
+import StringIO
+from IPython.display
+import Image
+
+# Reading the data
+data = pd.read_csv("/kaggle/input/covid19-demographic-predictors/covid19_by_country.csv")# Treatment of missing values
+data.fillna(0, inplace = True)
+data.head()
+
+X = data[data.columns[2: ]]
+y = data['Total Infected']
+
+# Finding pairwise correlation among the independent variables and dependent variable "Total Infected"
+data[data.columns[1: ]].corr()['Total Infected'][: ]
+
+plt.scatter(data['GDP 2018'], data['Population 2020'])
+plt.xlabel('GDP 2018')
+plt.ylabel('Population 2020')
+plt.title('GDP Vs Population')
+
+# Finding the outliers
+data[(data['GDP 2018'] > 1e13) | (data['Population 2020'] > 400000)]
+#China, USA and India are outliers
+
+# Only numeric data types are put in X
+X = data.select_dtypes(include = [np.float])
+X = data.select_dtypes(include = [np.number])
+X.dtypes
+
+# Double checking and treating
+for missing values
+X.fillna(0, inplace = True)
+
+# Performing OLS
+X_scaled = StandardScaler().fit_transform(X)
+reg = sm.OLS(y, X_scaled)
+est2 = reg.fit()
+print(est2.summary(xname = [ * X.columns]))# small p - value, reject the null hypothesis
+
+# Random forest and decision tree
+rfr = RandomForestRegressor(max_depth = 3)
+rfr.fit(X_scaled, y)
+print('score', rfr.score(X_scaled, y), '\n')[print(c + '\t', f) for c, f in zip(data[data.columns[2: ]], rfr.feature_importances_)]
+
+tree = DecisionTreeRegressor(max_depth = 3)
+tree.fit(X_scaled, y)
+print('score', tree.score(X_scaled, y), '\n')
+print('Feature Importances')[print(c + '\t', f) for c, f in zip(data[data.columns[2: ]], tree.feature_importances_)]
+
+tree_data = export_graphviz(tree, out_file = None,
+  filled = True, rounded = True,
+  special_characters = True, feature_names = X.columns)
+graph = graphviz.Source(tree_data)
+graph
+
+# In this analysis, population was the single biggest predictor of COVID - 19 infections.
+#This makes sense given the huge outliers shown in the scatter plot above.
+#Remove those outliers and rerun the experiment
+
+
+
